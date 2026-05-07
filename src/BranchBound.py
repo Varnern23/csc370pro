@@ -1,8 +1,11 @@
-def branchBoundSolutionWithGreedy(cpu_list):
+def branchBoundSolutionWithGreedy(optimal, time):
     #again we use the dictionary because its mutable only difference is we are setting them to the greedy solutions result
+    cpu_list = []
+    for key in optimal:
+        cpu_list.append(optimal[key]["list_of_processes"])
     best = {
-        "tallest": max(sum(i) for i in cpu_list),
-        "assignment": [i[:] for i in cpu_list],
+        "tallest": time,
+        "assignment": cpu_list,
     }
     #look at comment for the computeLowerBound function
     lowerBound = computeLowerBound(cpu_list)

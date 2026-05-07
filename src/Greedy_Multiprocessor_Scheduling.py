@@ -3,9 +3,9 @@ from BnB import branchBoundSolutionBase as branch_bound_solution_base
 def main():
     job1 = [10, 9, 8, 7, 6, 5, 4]
     cpu1 = 3
-    find_solution(job1, cpu1)
-    # branch_bound_solution(find_solution(job1, cpu1))
-    # branch_bound_solution_base(job1, cpu1)
+    optimal, time = find_solution(job1, cpu1)
+    branch_bound_solution(optimal, time)
+    branch_bound_solution_base(job1, cpu1)
 
 def re_sort_dict(cpu_list):
     index = len(cpu_list)
@@ -47,12 +47,12 @@ def find_solution(job_list, num_of_cpus):
         l = first_cpu["list_of_processes"]
         l.append(el)
         first_cpu.update({"list_of_processes":l})
-        # make sure newly updated dict entry at index 0 is in correct spot 
+        # make sure newly updated dict entry at index 0 is in correct spot
         re_sort_dict(cpu_list)
         
     print("Optimal Job Configuation", cpu_list)
     last_cpu = "cpu"+str(num_of_cpus)
     print("Total Time:", cpu_list[last_cpu]["time"])
-
+    return cpu_list, cpu_list[last_cpu]["time"]
 if __name__ == "__main__":
     main()
