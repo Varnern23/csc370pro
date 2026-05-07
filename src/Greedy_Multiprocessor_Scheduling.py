@@ -50,9 +50,13 @@ def find_solution(job_list, num_of_cpus):
         # make sure newly updated dict entry at index 0 is in correct spot
         re_sort_dict(cpu_list)
         
-    print("Optimal Job Configuation", cpu_list)
+    optimal = []
+    for key in cpu_list:
+        optimal.append(cpu_list[key]["list_of_processes"])
+    print("Optimal Job Configuation", optimal)
     last_cpu = "cpu"+str(num_of_cpus)
     print("Total Time:", cpu_list[last_cpu]["time"])
-    return cpu_list, cpu_list[last_cpu]["time"]
+
+    return optimal, cpu_list[last_cpu]["time"]
 if __name__ == "__main__":
     main()
