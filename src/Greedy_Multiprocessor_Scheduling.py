@@ -1,11 +1,12 @@
 from BranchBound import branchBoundSolutionWithGreedy as branch_bound_solution
 from BnB import branchBoundSolutionBase as branch_bound_solution_base
 def main():
+    import random
+    random.seed(42)
     job1 = [10, 9, 8, 7, 6, 5, 4]
     cpu1 = 3
     optimal, time = find_solution(job1, cpu1)
     branch_bound_solution(optimal, time)
-    branch_bound_solution_base(job1, cpu1)
 
 def re_sort_dict(cpu_list):
     index = len(cpu_list)
