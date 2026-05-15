@@ -1,5 +1,7 @@
+import heapq
 from BranchBound import branchBoundSolutionWithGreedy as branch_bound_solution
 from BnB import branchBoundSolutionBase as branch_bound_solution_base
+
 def main():
     import random
     random.seed(42)
@@ -8,56 +10,32 @@ def main():
     optimal, time = find_solution(job1, cpu1)
     branch_bound_solution(optimal, time)
 
-def re_sort_dict(cpu_list):
-    index = len(cpu_list)
-    cpu_list_2 = iter(cpu_list)
-    prev_cpu = {}
-    prev_key = ""
-    for x in cpu_list_2:
-        curr_cpu = cpu_list[x]
-        if(not prev_cpu):
-            prev_cpu = curr_cpu
-            prev_key = x
-            continue
-        if(prev_cpu["time"] > curr_cpu["time"]):
-            # swap
-            new_first = {"time" : curr_cpu["time"], "list_of_processes" : curr_cpu["list_of_processes"]}
-            new_second = {"time" : prev_cpu["time"], "list_of_processes" : prev_cpu["list_of_processes"]}
-            cpu_list[prev_key] = new_first
-            cpu_list[x] = new_second
-        elif(prev_cpu["time"] <= curr_cpu["time"]):
-            return
-        prev_key = x
-
 def find_solution(job_list, num_of_cpus):
-    # sort job list in descending order
-    job_list.sort(reverse = True)
+    # biggest jobs first so we deal with the hard ones early
+    job_list.sort(reverse=True)
 
-    # empty cpu dictionary
-    cpu_list = {}
-    for i in range(1,num_of_cpus+1):
-        n_cpu = "cpu"+str(i)
-        entry = {"time" : 0, "list_of_processes": []}
-        cpu_list[n_cpu] = entry
+    # each cpu starts at 0 time with nothing assigned
+    # heap keeps the least busy cpu at the front automatically
+    heap = [(0, i, []) for i in range(num_of_cpus)]
+    heapq.heapify(heap)
 
-    # for each job, add to cpu with smallest total time
-    # which will be first, since dict is sorted
-    for el in job_list:
-        first_cpu = next(iter(cpu_list.values()), None)
-        first_cpu["time"] += el
-        l = first_cpu["list_of_processes"]
-        l.append(el)
-        first_cpu.update({"list_of_processes":l})
-        # make sure newly updated dict entry at index 0 is in correct spot
-        re_sort_dict(cpu_list)
-        
-    optimal = []
-    for key in cpu_list:
-        optimal.append(cpu_list[key]["list_of_processes"])
-    print("Optimal Job Configuation", optimal)
-    last_cpu = "cpu"+str(num_of_cpus)
-    print("Total Time:", cpu_list[last_cpu]["time"])
+    for job in job_list:
+        # grab whichever cpu has the most free time right now
+        time, idx, processes = heapq.heappop(heap)
+        # give it this job and put it back in the heap
+        heapq.heappush(heap, (time + job, idx, processes + [job]))
 
-    return optimal, cpu_list[last_cpu]["time"]
+    # put results back in cpu order for readability
+    results = sorted(heap, key=lambda x: x[1])
+    optimal = [processes for _, _, processes in results]
+
+    # whoever finished last determines how long everything took
+    total_time = max(time for time, _, _ in heap)
+
+    print("Optimal Job Configuration:", optimal)
+    print("Total Time:", total_time)
+
+    return optimal, total_time
+
 if __name__ == "__main__":
     main()
